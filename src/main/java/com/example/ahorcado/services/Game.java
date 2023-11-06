@@ -4,9 +4,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 /**
  * La clase `Game` representa un juego de ahorcado. Contiene la lógica y el estado del juego.
@@ -16,8 +14,8 @@ import java.util.Random;
 @Slf4j
 public class Game {
     private String palabra; // La palabra a adivinar.
-    private ArrayList<Character> letrasAcertadas; // Lista de letras adivinadas.
-    private ArrayList<Character> letrasFalladas; // Lista de letras incorrectas.
+    private Set<Character> letrasAcertadas; // Lista de letras adivinadas.
+    private Set<Character> letrasFalladas; // Lista de letras incorrectas.
     private ArrayList<Character> letrasProbadas; // Lista de letras probadas.
     private static ArrayList<String> palabrasJugadas = new ArrayList<>(); // Lista de palabras jugadas previamente.
     private int fallos; // Contador de fallos.
@@ -27,10 +25,27 @@ public class Game {
      */
     public Game() {
         this.palabra = palabraRandom(); // Obtiene una palabra aleatoria no jugada previamente.
-        this.letrasAcertadas = new ArrayList<>(); // Inicializa la lista de letras adivinadas.
-        this.letrasFalladas = new ArrayList<>(); // Inicializa la lista de letras incorrectas.
+        this.letrasAcertadas = new HashSet<>(); // Inicializa la lista de letras adivinadas.
+        this.letrasFalladas = new HashSet<>(); // Inicializa la lista de letras incorrectas.
         this.letrasProbadas = new ArrayList<>(); // Inicializa la lista de letras probadas.
         this.fallos = 0; // Inicializa el contador de fallos.
+    }
+
+    /**
+     * Controlador para 2 jugadores inicializa la palabra y la pista con datos del usuario
+     * @param palabra Palabra elegida por el usuario
+     * @param pista Pista introducida por el usuario
+     */
+    public Game(String palabra, String pista) {//
+        palabras.add(0, palabra);
+        pistas.add(0, pista);
+
+        this.palabra = palabras.get(0);
+        this.letrasAcertadas = new HashSet<>();
+        this.letrasFalladas = new HashSet<>();
+        this.letrasProbadas = new ArrayList<>();
+        this.fallos = 0;
+
     }
 
     /**
@@ -112,8 +127,8 @@ public class Game {
         Random random = new Random();
 
         do {
-            int iRandom = random.nextInt(palabras.length);
-            palabraRandom = palabras[iRandom];
+            int iRandom = random.nextInt(palabras.size());
+            palabraRandom = palabras.get(iRandom);
         } while (palabrasJugadas.contains(palabraRandom));
 
         palabrasJugadas.add(palabraRandom);
@@ -127,14 +142,14 @@ public class Game {
      */
     private HashMap<String, String> mapaPalabraPista() {
         HashMap<String, String> mapa = new HashMap<>();
-        for (int i = 0; i < palabras.length; i++) {
-            mapa.put(palabras[i], pistas[i]);
+        for (int i = 0; i < palabras.size(); i++) {
+            mapa.put(palabras.get(i), pistas.get(i));
         }
         return mapa;
     }
 
 
-    private final String[] palabras = {
+    private final ArrayList<String> palabras = new ArrayList<>(Arrays.asList(
             "CASA", "PERRO", "GATO", "FLOR", "COCHE", "SOL", "LUNA", "MAR", "MONTAÑA", "RIO",
             "MESA", "SILLA", "VENTANA", "PUERTA", "JARDIN", "CIELO", "TIERRA", "AIRE", "FUEGO", "AGUA",
             "MANZANA", "PLATANO", "UVA", "NARANJA", "LIMON", "KIWI", "SANDIA", "FRESA", "PIÑA", "MELOCOTON",
@@ -142,10 +157,10 @@ public class Game {
             "AMIGO", "FAMILIA", "PADRE", "MADRE", "HERMANO", "HERMANA", "ABUELO", "ABUELA", "TIO", "TIA",
             "COMIDA", "CENA", "DESAYUNO", "TELEVISOR", "PANTALLA", "SOMBRILLA", "VENTILADOR", "CUBIERTOS", "RELOJ",
             "CALENDARIO", "MONITOR", "TELEFONO", "COMPUTADORA", "ESPEJO", "CUCHARA", "TENEDOR", "CUCHILLO", "ESCALERA"
-    };
+    ));
 
 
-    private final String[] pistas = {
+    private final ArrayList<String> pistas = new ArrayList<>(Arrays.asList(
             "Lugar donde vives.", // CASA
             "Un amigo de cuatro patas.", // PERRO
             "Un felino doméstico.", // GATO
@@ -213,6 +228,7 @@ public class Game {
             "Se usa para servir alimentos líquidos o para comer.", // CUCHARA
             "Ayuda a comer alimentos sólidos y a pincharlos.", // TENEDOR
             "Un utensilio afilado para cortar alimentos.", // CUCHILLO
-            "La usas para subir o bajar de un lugar elevado." // ESCALERA
-    };
+            "La usas para subir o bajar de un lugar elevado.")); // ESCALERA
+
+
 }

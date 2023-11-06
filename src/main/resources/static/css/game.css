@@ -4,6 +4,27 @@ body {
     text-align: center;
 }
 
+.container {
+    display: flex;
+    justify-content: space-between; /* Para que los contenedores estén uno al lado del otro */
+    align-items: center;
+    max-width: 800px; /* Ajusta el ancho máximo del contenedor según tus necesidades */
+    margin: 0 auto; /* Centra el contenido horizontalmente */
+    padding: 20px;
+}
+
+.game-info {
+    text-align: center;
+}
+
+.game-stats {
+    text-align: left; /* Alinea las estadísticas a la izquierda */
+    }
+
+.game-stats:empty {
+    display: none;
+}
+
 h1 {
     color: #333;
 }

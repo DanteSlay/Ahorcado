@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/game.css">
+    <title>Ahorcado</title>
+</head>
+<body>
+<div class="container">
+    <div class="game-info">
+        <h1>Ahorcado</h1>
+        <img id="imagen" src="">
+
+        <h4 th:if="${finalizar}" th:text="${finalizar}"></h4>
+        <div th:replace="~{/fragmentos/palabraOculta::palabraOculta}"></div>
+
+        <p th:text="${pista}"></p>
+        <form th:action="@{/adivinar}" method="post">
+            <label for="intentoPalabra">Intentar adivinar la palabra:</label>
+            <input type="text" id="intentoPalabra" name="intentoPalabra" required>
+            <button type="submit" th:disabled="${juegoTerminado}">Adivinar</button>
+        </form>
+        <div th:if="${juegoTerminado}">
+            <a th:href="@{/nuevaPartida}">
+                <button style="background-color: #FF0000">Nueva Partida</button>
+            </a>
+        </div>
+
+        <div id="teclado">
+            <button th:each="letra : ${abecedario}" th:value="${letra}"
+                    th:text="${letra}" th:class="${letrasProbadas.contains(letra)} ? 'letra-oculta':'tecla'"
+                    th:disabled="${juegoTerminado}">
+            </button>
+        </div>
+    </div>
+
+    <div sec:authorize="hasRole('ROLE_ADMIN')" class="game-stats">
+        <h4>Estadisticas:</h4>
+        <p th:text="'Palabra: ' + ${partida.getPalabra()}"></p>
+        <p th:text="'Letras Acertadas: ' + ${partida.getLetrasAcertadas()}"></p>
+        <p th:text="'Letras Falladas: ' + ${partida.getLetrasFalladas()}"></p>
+        <p th:text="'Fallos: ' + ${partida.getFallos()}"></p>
+        <p th:text="'Partidas Jugadas: ' + ${stats.partidasJugadas}"></p>
+        <p th:text="'Palabras Acertadas: ' + ${stats.getPalabrasAcertadas()}"></p>
+        <p th:text="'Palabras Falladas: ' + ${stats.getPalabrasFalladas()}"></p>
+    </div>
+</div>
+
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>
