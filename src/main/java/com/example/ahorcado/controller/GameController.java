@@ -86,7 +86,7 @@ public class GameController {
             estadisticas.addFallos(partida.getLetrasFalladas());
         }
 
-        return "ahorcado-admin";
+        return "ahorcado";
     }
 
 

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/css/home.css">
+  <title>Juego de Ahorcado</title>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <h1>Bienvenido al Juego de Ahorcado</h1>
+      <p>¿Estás listo para poner a prueba tu habilidad con las palabras? Adivina la palabra oculta antes de que se complete el ahorcado.</p>
+      <div sec:authorize="hasRole('ROLE_ADMIN')">
+        <p>Al ser administrador contarás con información privilegiada.</p>
+        <a th:href="@{/ahorcado}">
+          <button class="start-button" th:href="@{/ahorcado}">Empezar como Administrador</button>
+        </a>
+      </div>
+      <div sec:authorize="!hasRole('ROLE_ADMIN')">
+        <p>Selecciona el tipo de partida:</p>
+        <a th:href="@{/ahorcado}">
+          <button class="start-button green">Partida Rápida</button>
+        </a>
+        <button class="start-button blue" th:href="@{/dos-jugadores}">2 Jugadores</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
