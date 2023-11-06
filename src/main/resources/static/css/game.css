@@ -1,0 +1,68 @@
+/* Estilo general */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+/* Estilo de la imagen */
+#imagen {
+    max-width: 100%;
+    height: auto;
+    margin: 15px 0;
+}
+
+/* Estilo del mensaje de finalización */
+h4 {
+    color: #FF0000;
+}
+
+/* Estilo del formulario */
+form {
+    margin: 20px 0;
+}
+
+/* Estilo de los botones */
+button {
+    width: 100px;
+    height: 40px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Estilo del teclado */
+#teclado {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin: 20px auto;
+    max-width: 400px;
+}
+
+.tecla {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    text-align: center;
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.letra-oculta {
+    width: 40px;
+    height: 40px;
+    opacity: 0;
+    pointer-events: none;
+}
