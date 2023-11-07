@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/ahorca2.css">
+    <title>Ahorcado - Configuración de Palabra y Pista</title>
+</head>
+<body>
+<div class="container">
+    <div class="game-info">
+        <h1>Turno del Jugador 1</h1>
+        <form th:action="@{/ahorca2/submit}" method="post">
+            <div>
+                <label for="nuevaPalabra">Escribe una palabra:</label>
+                <input type="text" id="nuevaPalabra" name="nuevaPalabra" required>
+            </div>
+            <div>
+                <label for="pista">Cual es tu pista?:</label>
+                <textarea id="pista" name="nuevaPista" rows="4" required></textarea>
+            </div>
+            <button type="submit">Guardar Palabra y Pista</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

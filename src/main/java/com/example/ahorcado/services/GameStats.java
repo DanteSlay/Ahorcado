@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Set;
 
+/**
+ * Clase que representa las Estadísticas Globales del juego
+ */
 @Service
 @Data
 public class GameStats {

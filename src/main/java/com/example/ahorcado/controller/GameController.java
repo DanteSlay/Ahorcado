@@ -24,11 +24,13 @@ import java.util.List;
 public class GameController {
     @Autowired
     private Game partida;
-
     @Autowired
     private GameStats estadisticas = new GameStats();
-
     private final int MAX_FALLOS = 6;
+
+    private boolean ahorca2 = false;
+/*    private int puntosJugador2;
+    private int puntosJugador1;*/
 
     /**
      * Maneja la solicitud GET en la ruta "/" para iniciar o continuar el juego.
@@ -37,7 +39,7 @@ public class GameController {
      * @param model    El modelo que se utiliza para renderizar la vista.
      * @return La vista "index" para mostrar el juego.
      */
-    @GetMapping("/ahorcado")
+    @GetMapping({"/ahorcado", "/ahorca2"})
     public String inicio(HttpServletResponse response, Model model) {
         // Determina si el juego ha terminado.
         boolean juegoTerminado = false;
@@ -120,18 +122,43 @@ public class GameController {
     /**
      * Maneja la solicitud para iniciar una nueva partida del juego.
      *
-     * @return Una redirección a la página de inicio del juego.
+     * @return Si ahorca2 está activo redirige al formulario de palabra si el valor es false redirige al juego individual.
      */
     @GetMapping("/nuevaPartida")
     public String nuevaPartida() {
+        if (ahorca2) return "redirect:/ahorca2/nuevaPartida";
+
         partida = new Game();
         estadisticas.nuevaPartida(partida.getPalabra());
-        log.info(partida.toString());
 
         return "redirect:/ahorcado";
     }
 
-//    @GetMapping("/ahorca2/inicio")
+    /**
+     * Muestra el formulario para introducir palabra y pista
+     * @return Pagina con formulario
+     */
+    @GetMapping("/ahorca2/nuevaPartida")
+    public String form2jugadores() {
+        return "ahorca2";
+    }
+
+    /**
+     * Inicia una nueva partida con la palabra y pista del usuario
+     * @param nuevaPalabra Palabra del usuario
+     * @param nuevaPista Pista del usuario
+     * @return Pagina del juego
+     */
+    @PostMapping("/ahorca2/submit")
+    public String ahorca2submit(@RequestParam("nuevaPalabra") String nuevaPalabra,
+                                @RequestParam("nuevaPista") String nuevaPista) {
+        partida = new Game(nuevaPalabra.toUpperCase(), nuevaPista);
+        ahorca2 = true;
+        /*puntosJugador1 = 0;
+        puntosJugador1 = 0;*/
+
+        return "redirect:/ahorca2";
+    }
 
     /**
      * Genera una cookie llamada "fallos" con el número de fallos especificado y la configura para que expire en 2 horas.
