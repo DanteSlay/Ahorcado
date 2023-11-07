@@ -29,8 +29,9 @@ public class GameController {
     private final int MAX_FALLOS = 6;
 
     private boolean ahorca2 = false;
-/*    private int puntosJugador2;
-    private int puntosJugador1;*/
+    private int jugador1 = 0;
+    private int jugador2 = 0;
+    private int turno = 1;
 
     /**
      * Maneja la solicitud GET en la ruta "/" para iniciar o continuar el juego.
@@ -47,7 +48,6 @@ public class GameController {
         // Obtiene la cantidad actual de fallos en el juego.
         int fallos = partida.getFallos();
 
-
         // Comprueba si el juego sigue en progreso o ha terminado por exceso de fallos.
         if (fallos < MAX_FALLOS) {
             generarCookieFallos(fallos, response);
@@ -58,6 +58,7 @@ public class GameController {
             generarCookieFallos(MAX_FALLOS, response);
             model.addAttribute("finalizar", "Vaya, has perdido. La palabra era:");
             estadisticas.fallarPalabra(partida.getPalabra());
+            establecerPuntuacion();
             juegoTerminado = true;
         }
 
@@ -65,6 +66,7 @@ public class GameController {
         if (!partida.obtenerPalabraOculta().contains("_")) {
             model.addAttribute("finalizar", "¡Enhorabuena! Palabra correcta");
             estadisticas.acertarPalabra(partida.getPalabra());
+            establecerPuntuacion();
             juegoTerminado = true;
         }
 
@@ -81,6 +83,11 @@ public class GameController {
         // Si el juego ha terminado por exceso de fallos, muestra la palabra oculta.
         if (fallos >= MAX_FALLOS) {
             model.addAttribute("palabraOculta", partida.getPalabra());
+        }
+
+        if (ahorca2) {
+            model.addAttribute("jugador1", jugador1);
+            model.addAttribute("jugador2", jugador2);
         }
 
         if (juegoTerminado) {
@@ -124,7 +131,9 @@ public class GameController {
      */
     @GetMapping("/nuevaPartida")
     public String nuevaPartida() {
-        if (ahorca2) return "redirect:/ahorca2/nuevaPartida";
+        if (ahorca2){
+            return "redirect:/ahorca2/nuevaPartida";
+        }
 
         partida = new Game();
         estadisticas.nuevaPartida(partida.getPalabra());
@@ -140,6 +149,9 @@ public class GameController {
     public String salir() {
         ahorca2 = false;
         partida = new Game();
+        jugador1 = 0;
+        jugador2 = 0;
+        turno = 1;
         return "redirect:/home";
     }
 
@@ -148,7 +160,12 @@ public class GameController {
      * @return Pagina con formulario
      */
     @GetMapping("/ahorca2/nuevaPartida")
-    public String form2jugadores() {
+    public String form2jugadores(Model model) {
+        ahorca2 = true;
+        if (turno % 2 != 0) {
+            model.addAttribute("jugador2", "Jugador 2");
+        }
+
         return "ahorca2";
     }
 
@@ -162,11 +179,19 @@ public class GameController {
     public String ahorca2submit(@RequestParam("nuevaPalabra") String nuevaPalabra,
                                 @RequestParam("nuevaPista") String nuevaPista) {
         partida = new Game(nuevaPalabra.toUpperCase(), nuevaPista);
-        ahorca2 = true;
-        /*puntosJugador1 = 0;
-        puntosJugador1 = 0;*/
 
         return "redirect:/ahorca2";
+    }
+
+    public void establecerPuntuacion() {
+        if (!partida.obtenerPalabraOculta().contains("_")) {
+            if (turno % 2 == 0) {
+                jugador2++;
+            } else {
+                jugador1++;
+            }
+        }
+        turno++;
     }
 
     /**

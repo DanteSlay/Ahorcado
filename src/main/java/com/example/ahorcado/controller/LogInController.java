@@ -21,13 +21,13 @@ public class LogInController {
     }
 
     @GetMapping("/login")
-    public String login(HttpSession session) {
-        session.invalidate();
+    public String login() {
         return "login";
     }
 
     @GetMapping("/logout")
-    public String logout() {
+    public String logout(HttpSession session) {
+        session.invalidate();
         return "login";
     }
 

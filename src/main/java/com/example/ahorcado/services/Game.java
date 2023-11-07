@@ -21,6 +21,7 @@ public class Game {
     private static ArrayList<String> palabrasJugadas = new ArrayList<>(); // Lista de palabras jugadas previamente.
     private int fallos; // Contador de fallos.
 
+
     /**
      * Constructor de la clase `Game`. Inicializa una nueva partida.
      */
@@ -45,7 +46,6 @@ public class Game {
         this.letrasFalladas = new HashSet<>();
         this.letrasProbadas = new ArrayList<>();
         this.fallos = 0;
-
     }
 
     /**

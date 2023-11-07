@@ -10,6 +10,11 @@
 <div class="container">
     <div class="game-info">
         <h1>Ahorcado</h1>
+        <h4 th:if="${jugador1} != null" class="marcador">
+            <span class="jugador">Jugador 1</span>
+            <span class="puntuacion" th:text="${jugador1} + ':' + ${jugador2}"></span>
+            <span class="jugador">Jugador 2</span>
+        </h4>
         <img id="imagen" src="">
 
         <h4 th:if="${finalizar}" th:text="${finalizar}"></h4>

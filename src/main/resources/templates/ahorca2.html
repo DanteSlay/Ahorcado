@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/ahorca2.css">
-    <title>Ahorcado - Configuración de Palabra y Pista</title>
+    <title>Ahorca2</title>
 </head>
 <body>
 <div class="container">
     <div class="game-info">
-        <h1>Turno del Jugador 1</h1>
+        <h1 th:if="${jugador2}" th:text="'El verdugo es el Jugador 2'"></h1>
+        <h1 th:unless="${jugador2}" th:text="'El verdugo es el Jugador 1'"></h1>
         <form th:action="@{/ahorca2/submit}" method="post">
             <div>
                 <label for="nuevaPalabra">Escribe una palabra:</label>

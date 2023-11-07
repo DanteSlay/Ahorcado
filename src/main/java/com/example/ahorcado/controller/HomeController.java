@@ -12,7 +12,6 @@ public class HomeController {
 
     @GetMapping("/home")
     public String home(Principal principal) {
-        log.info(principal.toString());
         return "home";
     }
 }

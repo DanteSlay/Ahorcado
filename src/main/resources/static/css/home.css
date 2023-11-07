@@ -11,8 +11,7 @@ body {
 }
 
 .container {
-    display: flex;
-    justify-content: center;
+    display: block;
     align-items: center;
     max-width: 800px;
     margin: 0 auto;
@@ -44,6 +43,23 @@ p {
     cursor: pointer;
     transition: background-color 0.3s;
     margin: 10px;
+}
+.button-center {
+    text-align: center;
+    margin-top: 20px; /* Ajusta el margen superior según tus preferencias */
+}
+
+.button-center .start-button {
+    background-color: #FF0000; /* Cambia el color de fondo al rojo para el botón de cerrar sesión */
+    width: 200px; /* Ajusta el ancho del botón según tus preferencias */
+    height: 60px; /* Ajusta la altura del botón según tus preferencias */
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 10px;
+    color: #fff; /* Cambia el color del texto a blanco */
 }
 
 .green {
