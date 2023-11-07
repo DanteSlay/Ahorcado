@@ -71,7 +71,7 @@ public class GameController {
         // Actualiza el modelo con la información relevante.
         model.addAttribute("palabraOculta", partida.obtenerPalabraOculta());
         model.addAttribute("abecedario", obtenerAbecedario());
-        model.addAttribute("pista", partida.obtenerPista());
+        model.addAttribute("pista", partida.getPista());
         model.addAttribute("letrasProbadas", partida.getLetrasProbadas());
         model.addAttribute("juegoTerminado", juegoTerminado);
 
@@ -90,8 +90,6 @@ public class GameController {
 
         return "ahorcado";
     }
-
-
 
     /**
      * Maneja la solicitud GET para adivinar una palabra en el juego.
@@ -132,6 +130,17 @@ public class GameController {
         estadisticas.nuevaPartida(partida.getPalabra());
 
         return "redirect:/ahorcado";
+    }
+
+    /**
+     * Desactiva el chivato de 2 jugadores, borra los datos de la anterior partida
+     * @return Página de Eleccion de partidas
+     */
+    @GetMapping("/salir")
+    public String salir() {
+        ahorca2 = false;
+        partida = new Game();
+        return "redirect:/home";
     }
 
     /**

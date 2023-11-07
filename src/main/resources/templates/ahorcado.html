@@ -21,10 +21,18 @@
             <input type="text" id="intentoPalabra" name="intentoPalabra" required>
             <button type="submit" th:disabled="${juegoTerminado}">Adivinar</button>
         </form>
-        <div th:if="${juegoTerminado}">
-            <a th:href="@{/nuevaPartida}">
-                <button style="background-color: #FF0000">Nueva Partida</button>
-            </a>
+        <div class="botones-especiales">
+            <div>
+                <a th:href="@{/salir}">
+                    <button style="background-color: #FF0000">Salir</button>
+                </a>
+            </div>
+
+            <div th:if="${juegoTerminado}">
+                <a th:href="@{/nuevaPartida}">
+                    <button class="especial">Nueva Partida</button>
+                </a>
+            </div>
         </div>
 
         <div id="teclado">

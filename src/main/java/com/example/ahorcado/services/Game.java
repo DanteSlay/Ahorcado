@@ -14,6 +14,7 @@ import java.util.*;
 @Slf4j
 public class Game {
     private String palabra; // La palabra a adivinar.
+    private String pista; // La pista de la palabra
     private Set<Character> letrasAcertadas; // Lista de letras adivinadas.
     private Set<Character> letrasFalladas; // Lista de letras incorrectas.
     private ArrayList<Character> letrasProbadas; // Lista de letras probadas.
@@ -25,6 +26,7 @@ public class Game {
      */
     public Game() {
         this.palabra = palabraRandom(); // Obtiene una palabra aleatoria no jugada previamente.
+        this.pista = obtenerPista();
         this.letrasAcertadas = new HashSet<>(); // Inicializa la lista de letras adivinadas.
         this.letrasFalladas = new HashSet<>(); // Inicializa la lista de letras incorrectas.
         this.letrasProbadas = new ArrayList<>(); // Inicializa la lista de letras probadas.
@@ -36,11 +38,9 @@ public class Game {
      * @param palabra Palabra elegida por el usuario
      * @param pista Pista introducida por el usuario
      */
-    public Game(String palabra, String pista) {//
-        palabras.add(0, palabra);
-        pistas.add(0, pista);
-
-        this.palabra = palabras.get(0);
+    public Game(String palabra, String pista) {
+        this.palabra = palabra;
+        this.pista = pista;
         this.letrasAcertadas = new HashSet<>();
         this.letrasFalladas = new HashSet<>();
         this.letrasProbadas = new ArrayList<>();

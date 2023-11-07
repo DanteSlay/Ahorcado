@@ -12,7 +12,7 @@
   <main class="container">
     <div class="login-container">
       <h2>Acceso al Ahorcado</h2>
-      <form sec:authorize="!isAuthenticated()" th:action="@{/login}" method="post">
+      <form th:action="@{/login}" method="post">
         <div class="input-group">
           <input type="text" name="username" placeholder="Usuario" required>
         </div>

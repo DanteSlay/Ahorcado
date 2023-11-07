@@ -61,6 +61,17 @@ button {
 button:hover {
     background-color: #45a049;
 }
+.botones-especiales {
+    display: flex;
+    justify-content: space-between; /* Para que los contenedores estén uno al lado del otro */
+    align-items: center;
+}
+.especial {
+    text-align: center;
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+}
 
 /* Estilo del teclado */
 #teclado {
