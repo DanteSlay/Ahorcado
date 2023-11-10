@@ -33,4 +33,25 @@ $(document).ready(() => {
         // Si la cookie "fallos" existe, actualiza la fuente de la imagen con el número de fallos.
         document.getElementById("imagen").src = "/img/" + fallosCookie + ".jpg";
     }
+    let tiempoRestante = 10;
+
+    // Actualiza el contenido del elemento con id "tiempo-restante" con el tiempo restante actualizado
+    function actualizarTemporizador() {
+        $("#tiempo-restante").text(tiempoRestante);
+    }
+
+    // Configura un temporizador que disminuirá el tiempo restante cada segundo
+    const temporizadorInterval = setInterval(() => {
+        tiempoRestante--;
+
+        // Verifica si el tiempo ha llegado a cero
+        if (tiempoRestante <= 0) {
+            clearInterval(temporizadorInterval); // Detiene el temporizador
+            // Agrega aquí la lógica que desees cuando el tiempo llega a cero
+            location.reload()
+        }
+
+        // Actualiza el temporizador en la vista
+        actualizarTemporizador();
+    }, 1000); // 1000 milisegundos = 1 segundo
 });

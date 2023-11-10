@@ -2,7 +2,7 @@ package com.example.ahorcado.controller;
 
 import com.example.ahorcado.services.Game;
 import com.example.ahorcado.services.GameStats;
-import jakarta.servlet.http.Cookie;
+import com.example.ahorcado.utilidades.Utilidades;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,6 @@ import java.util.Objects;
 @Controller
 @Slf4j
 public class GameController {
-    @Autowired
     private Game partida;
     @Autowired
     private GameStats estadisticas;
@@ -42,6 +41,7 @@ public class GameController {
      */
     @GetMapping({"/ahorcado", "/ahorca2"})
     public String inicio(HttpServletResponse response, Model model) {
+        if (partida == null) partida = new Game();
 
         // Comprueba si el juego sigue en progreso o ha terminado por exceso de fallos.
         if (!partida.demasiadosFallos()) {
@@ -63,6 +63,9 @@ public class GameController {
             if (isAdmin()) estadisticas.acertarPalabra(partida.getPalabra()); // Añade la palabra acertada a las stats del admin
         }
 
+        //Si la partida es de 2 jugadores y está terminada se establece la puntuación
+        if (partida.isPartidaTerminada() && partida.isAhorca2()) partida.establecerPuntuacion();
+
         //Si la partida es de 2 jugadores muestra la puntuacion de ambos
         if (partida.isAhorca2()) {
             model.addAttribute("jugador1", Game.puntosJugador1);
@@ -75,20 +78,19 @@ public class GameController {
             estadisticas.addFallos(partida.getLetrasFalladas());
         }
 
-        //Si la partida es de 2 jugadores y está terminada se establece la puntuación
-        if (partida.isPartidaTerminada() && partida.isAhorca2()) partida.establecerPuntuacion();
 
         // Actualiza el modelo con la información relevante.
         model.addAttribute("abecedario", obtenerAbecedario());
         model.addAttribute("pista", partida.getPista());
         model.addAttribute("letrasProbadas", partida.getLetrasProbadas());//Lista que indica cuáles letras no se mostrarán en el teclado
 
-        model.addAttribute("partida", partida);
-        model.addAttribute("stats", estadisticas);
-
+        if (isAdmin()) {
+            model.addAttribute("partida", partida);
+            model.addAttribute("stats", estadisticas);
+        }
 
         //Generamos la cookie de fallos (la imagen dependera de esta cookie)
-        generarCookieFallos(partida.getFallos(), response);
+        Utilidades.generarCookieFallos(partida.getFallos(), response);
 
         //Añadimos el chivato de si la partida termino para mostrar el boton de nueva partida
         model.addAttribute("juegoTerminado", partida.isPartidaTerminada());
@@ -124,8 +126,9 @@ public class GameController {
 
     /**
      * Maneja la solicitud para iniciar una nueva partida del juego.
+     * Si el usuario es Admin se guarda la palabra en sus Stats.
      *
-     * @return Si ahorca2 está activo redirige al formulario de palabra si el valor es false redirige al juego individual.
+     * @return Si ahorca2 está activo redirige al formulario de palabra si no redirige al juego estandar.
      */
     @GetMapping("/nuevaPartida")
     public String nuevaPartida() {
@@ -144,11 +147,12 @@ public class GameController {
      * @return Página de Eleccion de partidas
      */
     @GetMapping("/salir")
-    public String salir() {
-        partida = new Game();
+    public String salir(HttpServletResponse response) {
+        partida = null;
         Game.puntosJugador1 = 0;
         Game.puntosJugador2 = 0;
         Game.turno = 1;
+        Utilidades.generarCookieFallos(0, response);
         return "redirect:/home";
     }
 
@@ -179,18 +183,6 @@ public class GameController {
         return "redirect:/ahorca2";
     }
 
-    /**
-     * Genera una cookie llamada "fallos" con el número de fallos especificado y la configura para que expire en 2 horas.
-     *
-     * @param fallos   El número de fallos que se almacenará en la cookie.
-     * @param response El objeto HttpServletResponse utilizado para agregar la cookie a la respuesta.
-     */
-    private void generarCookieFallos(int fallos, HttpServletResponse response) {
-        Cookie cookie = new Cookie("fallos", String.valueOf(fallos));
-        cookie.setMaxAge(120 * 60);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-    }
 
     /**
      * Genera y retorna una lista que contiene el abecedario en mayúsculas, desde la letra 'A' hasta 'Z', incluyendo la letra 'Ñ'.
@@ -229,7 +221,7 @@ public class GameController {
             // Obtiene los roles del usuario
             for (GrantedAuthority authority : userDetails.getAuthorities()) {
                 String userRole = authority.getAuthority();
-                // Ahora puedes hacer algo con el rol del usuario
+
                 return userRole;
             }
         }

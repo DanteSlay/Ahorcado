@@ -22,18 +22,25 @@ body {
     display: flex;
     justify-content: space-between; /* Para que los contenedores estén uno al lado del otro */
     align-items: center;
-    max-width: 800px; /* Ajusta el ancho máximo del contenedor según tus necesidades */
+    max-width: 900px;
     margin: 0 auto; /* Centra el contenido horizontalmente */
     padding: 20px;
 }
 
 .game-info {
     text-align: center;
+    max-width: 600px;
 }
 
 .game-stats {
-    text-align: left; /* Alinea las estadísticas a la izquierda */
-    }
+    text-align: left;/* Alinea las estadísticas a la izquierda */
+    max-width: 300px; /* Establece una altura máxima para el contenedor de estadísticas */
+    overflow-y: auto; /* Habilita el desplazamiento vertical si el contenido excede la altura máxima */
+}
+
+.game-stats p {
+    margin: 5px 0; /* Agrega un espacio entre cada estadística */
+}
 
 .game-stats:empty {
     display: none;
@@ -52,6 +59,10 @@ h1 {
 
 /* Estilo del mensaje de finalización */
 h4 {
+    color: #FF0000;
+}
+
+#tiempo-restante {
     color: #FF0000;
 }
 

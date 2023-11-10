@@ -12,7 +12,7 @@ import java.util.Set;
 @Service
 @Data
 public class GameStats {
-    private int partidasJugadas;
+    private int partidasTerminadas;
     private ArrayList<String> palabrasJugadas;
     private ArrayList<String> palabrasAcertadas;
     private ArrayList<String> palabrasFalladas;
@@ -20,7 +20,7 @@ public class GameStats {
     private ArrayList<Character> letrasFalladas;
 
     public GameStats() {
-        this.partidasJugadas = 0;
+        this.partidasTerminadas = 0;
         this.palabrasJugadas = new ArrayList<>();
         this.palabrasAcertadas = new ArrayList<>();
         this.palabrasFalladas = new ArrayList<>();
@@ -28,7 +28,7 @@ public class GameStats {
         this.letrasFalladas = new ArrayList<>();
     }
     public void nuevaPartida(String palabra) {
-        partidasJugadas++;
+        partidasTerminadas++;
         palabrasJugadas.add(palabra);
     }
 

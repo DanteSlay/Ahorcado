@@ -10,6 +10,7 @@
 <div class="container">
     <div class="game-info">
         <h1>Ahorcado</h1>
+        <div th:if="${!juegoTerminado}" id="temporizador">Tiempo restante: <span id="tiempo-restante">10</span></div>
         <h4 th:if="${jugador1} != null" class="marcador">
             <span class="jugador">Jugador 1</span>
             <span class="puntuacion" th:text="${jugador1} + ':' + ${jugador2}"></span>
@@ -54,7 +55,7 @@
         <p th:text="'Letras Acertadas: ' + ${partida.getLetrasAcertadas()}"></p>
         <p th:text="'Letras Falladas: ' + ${partida.getLetrasFalladas()}"></p>
         <p th:text="'Fallos: ' + ${partida.getFallos()}"></p>
-        <p th:text="'Partidas Jugadas: ' + ${stats.partidasJugadas}"></p>
+        <p th:text="'Partidas Finalizadas: ' + ${stats.getPartidasTerminadas}"></p>
         <p th:text="'Palabras Acertadas: ' + ${stats.getPalabrasAcertadas()}"></p>
         <p th:text="'Palabras Falladas: ' + ${stats.getPalabrasFalladas()}"></p>
     </div>

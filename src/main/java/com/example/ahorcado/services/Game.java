@@ -1,8 +1,6 @@
 package com.example.ahorcado.services;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -10,8 +8,6 @@ import java.util.*;
  * La clase `Game` representa una partida del ahorcado. Contiene la lógica y el estado del juego.
  */
 @Data
-@Service
-@Slf4j
 public class Game {
     private String palabra; // La palabra a adivinar.
     private String pista; // La pista de la palabra
@@ -26,6 +22,7 @@ public class Game {
     public static int puntosJugador2 = 0;
     public static int turno = 1;
     private final int MAX_FALLOS = 6;
+    private Timer temporizador;
 
 
     /**
@@ -40,6 +37,8 @@ public class Game {
         this.fallos = 0; // Inicializa el contador de fallos.
         this.ahorca2 = false;
         this.partidaTerminada = false;
+        this.temporizador = new Timer();
+        iniciarTemporizador();
     }
 
     /**
@@ -56,7 +55,41 @@ public class Game {
         this.fallos = 0;
         this.ahorca2 = true;
         this.partidaTerminada = false;
+        this.temporizador = new Timer();
+        iniciarTemporizador();
 
+
+    }
+
+    /**
+     * Inicia el temporizador con una duración de 10 segundos, si la partida aún no ha terminado se sumará un fallo y se reinicia el temporizador
+     */
+    private void iniciarTemporizador() {
+        temporizador.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!partidaTerminada) {
+                    fallos++;
+                    reiniciarTemporizador();
+                }
+            }
+        }, 10000, 10000); // 10000 milisegundos = 10 segundos
+    }
+
+    /**
+     * Método para reiniciar el temporizador.
+     */
+    private void reiniciarTemporizador() {
+        detenerTemporizador();
+        temporizador = new Timer(); // Crea un nuevo temporizador
+        iniciarTemporizador();
+    }
+
+    /**
+     * Método para detener el temporizador.
+     */
+    private void detenerTemporizador() {
+        temporizador.cancel(); // Cancela la tarea actual
     }
 
     /**
@@ -66,6 +99,7 @@ public class Game {
     public boolean palabraDescubierta() {
         if (!obtenerPalabraOculta().contains("_")) {
             partidaTerminada = true;
+            detenerTemporizador();
             return true;
         }
         return false;
@@ -94,6 +128,7 @@ public class Game {
         if (fallos >= MAX_FALLOS) {
             fallos = MAX_FALLOS;
             partidaTerminada = true;
+            detenerTemporizador();
             return true;
         }
         return false;
@@ -101,7 +136,8 @@ public class Game {
 
 
     /**
-     * Comprueba si la letra proporcionada por el jugador está presente en la palabra actual y actualiza el estado del juego en consecuencia.
+     * Comprueba si la letra proporcionada por el jugador está presente en la palabra actual
+     * si es asi añade esa letra a la lista de acertadas o falladas, además reinicia el temporizador
      *
      * @param letra La letra a probar.
      * @return true si la letra es correcta y está presente en la palabra, false si es incorrecta.
@@ -111,18 +147,19 @@ public class Game {
         letrasProbadas.add(letra);
         if (palabra.contains(posibleLetra)) {
             letrasAcertadas.add(posibleLetra.charAt(0));
-
+            reiniciarTemporizador();
             return true;
         } else {
             letrasFalladas.add(posibleLetra.charAt(0));
             fallos++;
-
+            reiniciarTemporizador();
             return false;
         }
     }
 
     /**
-     * Comprueba si el intento del jugador coincide con la palabra actual y actualiza el estado del juego en consecuencia.
+     * Comprueba si el intento del jugador coincide con la palabra actual si es así añade todas las letras a la lista de acertadas.
+     * Reinicia el temporizador.
      *
      * @param intentoPalabra El intento de adivinar la palabra.
      * @return true si el intento es correcto, false si es incorrecto.
@@ -132,10 +169,11 @@ public class Game {
             for (char letra : palabra.toCharArray()) {
                 letrasAcertadas.add(letra);
             }
+            reiniciarTemporizador();
             return true;
         } else {
             fallos++;
-
+            reiniciarTemporizador();
             return false;
         }
     }
