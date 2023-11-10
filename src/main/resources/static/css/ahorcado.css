@@ -24,7 +24,7 @@ body {
     align-items: center;
     max-width: 900px;
     margin: 0 auto; /* Centra el contenido horizontalmente */
-    padding: 20px;
+    padding: 15px;
 }
 
 .game-info {

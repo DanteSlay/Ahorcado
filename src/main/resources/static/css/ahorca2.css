@@ -1,20 +1,30 @@
 /* Estilo general */
 body {
     font-family: Arial, sans-serif;
-    text-align: center;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
 }
 
+
 .container {
-    display: flex;
-    flex-direction: column; /* Apila los elementos verticalmente */
-    align-items: center; /* Centra los elementos verticalmente */
-    max-width: 800px; /* Ajusta el ancho máximo del contenedor según tus necesidades */
-    margin: 0 auto; /* Centra el contenido horizontalmente */
+    display: block;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 20px;
 }
 
 .game-info {
     text-align: center;
+    padding: 20px
 }
 
 h1 {
@@ -23,7 +33,7 @@ h1 {
 
 /* Estilo del formulario */
 form {
-    margin: 20px 0;
+    margin: 20px;
     text-align: center; /* Centra los elementos del formulario horizontalmente */
 }
 
