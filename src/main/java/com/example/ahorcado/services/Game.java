@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
- * La clase `Game` representa un juego de ahorcado. Contiene la lógica y el estado del juego.
+ * La clase `Game` representa una partida del ahorcado. Contiene la lógica y el estado del juego.
  */
 @Data
 @Service
@@ -20,6 +20,12 @@ public class Game {
     private ArrayList<Character> letrasProbadas; // Lista de letras probadas.
     private static ArrayList<String> palabrasJugadas = new ArrayList<>(); // Lista de palabras jugadas previamente.
     private int fallos; // Contador de fallos.
+    private boolean ahorca2; //Partida de 2 jugadores
+    private boolean partidaTerminada; //Si la partida ha finalizado
+    public static int puntosJugador1 = 0;
+    public static int puntosJugador2 = 0;
+    public static int turno = 1;
+    private final int MAX_FALLOS = 6;
 
 
     /**
@@ -32,6 +38,8 @@ public class Game {
         this.letrasFalladas = new HashSet<>(); // Inicializa la lista de letras incorrectas.
         this.letrasProbadas = new ArrayList<>(); // Inicializa la lista de letras probadas.
         this.fallos = 0; // Inicializa el contador de fallos.
+        this.ahorca2 = false;
+        this.partidaTerminada = false;
     }
 
     /**
@@ -46,7 +54,51 @@ public class Game {
         this.letrasFalladas = new HashSet<>();
         this.letrasProbadas = new ArrayList<>();
         this.fallos = 0;
+        this.ahorca2 = true;
+        this.partidaTerminada = false;
+
     }
+
+    /**
+     * Verifica si la palabra no contiene "_" por lo que ha sido descubierta, si es asi establece que la partida terminó.
+     * @return Un booleano indicando si la palabra fue descubierta.
+     */
+    public boolean palabraDescubierta() {
+        if (!obtenerPalabraOculta().contains("_")) {
+            partidaTerminada = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Si la palabra ha sido descubierta, añade un punto al jugador que corresponda según el turno de la partida.
+     * Independientemente, incrementa el turno de la partida
+     */
+    public void establecerPuntuacion() {
+        if (palabraDescubierta()) {
+            if (turno % 2 == 0) {
+                puntosJugador2++;
+            } else {
+                puntosJugador1++;
+            }
+        }
+        turno++;
+    }
+
+    /**
+     * Verifica si los fallos han alcanzado el rango máximo de fallos, si es asi establece los fallos al máximo y termina la partida.
+     * @return Un booleano si los fallos son igual o superior al máximo
+     */
+    public boolean demasiadosFallos() {
+        if (fallos >= MAX_FALLOS) {
+            fallos = MAX_FALLOS;
+            partidaTerminada = true;
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Comprueba si la letra proporcionada por el jugador está presente en la palabra actual y actualiza el estado del juego en consecuencia.

@@ -20,7 +20,7 @@ public class GameStats {
     private ArrayList<Character> letrasFalladas;
 
     public GameStats() {
-        this.partidasJugadas = 1;
+        this.partidasJugadas = 0;
         this.palabrasJugadas = new ArrayList<>();
         this.palabrasAcertadas = new ArrayList<>();
         this.palabrasFalladas = new ArrayList<>();

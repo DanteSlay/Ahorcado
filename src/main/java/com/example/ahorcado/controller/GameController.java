@@ -6,6 +6,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Controlador que maneja las solicitudes relacionadas con el juego.
@@ -25,75 +30,68 @@ public class GameController {
     @Autowired
     private Game partida;
     @Autowired
-    private GameStats estadisticas = new GameStats();
-    private final int MAX_FALLOS = 6;
-
-    private boolean ahorca2 = false;
-    private int jugador1 = 0;
-    private int jugador2 = 0;
-    private int turno = 1;
+    private GameStats estadisticas;
 
     /**
-     * Maneja la solicitud GET en la ruta "/" para iniciar o continuar el juego.
+     * Maneja los datos y la logica dependiendo si la partida es de admin, estandar o de 2 jugadores,
+     * mostrando información relevante segun que tipo de partida sea.
      *
      * @param response Objeto de respuesta HTTP para gestionar las cookies.
      * @param model    El modelo que se utiliza para renderizar la vista.
-     * @return La vista "index" para mostrar el juego.
+     * @return La vista "ahorcado" para mostrar el juego.
      */
     @GetMapping({"/ahorcado", "/ahorca2"})
     public String inicio(HttpServletResponse response, Model model) {
-        // Determina si el juego ha terminado.
-        boolean juegoTerminado = false;
-
-        // Obtiene la cantidad actual de fallos en el juego.
-        int fallos = partida.getFallos();
 
         // Comprueba si el juego sigue en progreso o ha terminado por exceso de fallos.
-        if (fallos < MAX_FALLOS) {
-            generarCookieFallos(fallos, response);
+        if (!partida.demasiadosFallos()) {
+            //Si no hay demasiados fallos añade la palabra oculta
+            model.addAttribute("palabraOculta", partida.obtenerPalabraOculta());
 
         } else {
-            // Establece el máximo de fallos permitidos y muestra un mensaje.
-            partida.setFallos(MAX_FALLOS);
-            generarCookieFallos(MAX_FALLOS, response);
+            //Si los hay muestra un mensaje de que ha perdido y muestra la palabra completa
             model.addAttribute("finalizar", "Vaya, has perdido. La palabra era:");
-            estadisticas.fallarPalabra(partida.getPalabra());
-            establecerPuntuacion();
-            juegoTerminado = true;
+            model.addAttribute("palabraOculta", partida.getPalabra());
+
+            if (isAdmin()) estadisticas.fallarPalabra(partida.getPalabra()); //Añade la palabra fallada a las stats del admin
         }
 
-        // Comprueba si el jugador ha adivinado todas las letras de la palabra.
-        if (!partida.obtenerPalabraOculta().contains("_")) {
+        // Comprueba si la partida ha finalizado al acertar la palabra y muestra un mensaje de felicitación.
+        if (partida.palabraDescubierta()) {
             model.addAttribute("finalizar", "¡Enhorabuena! Palabra correcta");
-            estadisticas.acertarPalabra(partida.getPalabra());
-            establecerPuntuacion();
-            juegoTerminado = true;
+
+            if (isAdmin()) estadisticas.acertarPalabra(partida.getPalabra()); // Añade la palabra acertada a las stats del admin
         }
+
+        //Si la partida es de 2 jugadores muestra la puntuacion de ambos
+        if (partida.isAhorca2()) {
+            model.addAttribute("jugador1", Game.puntosJugador1);
+            model.addAttribute("jugador2", Game.puntosJugador2);
+        }
+
+        //Si la partida es de admin añade las letras acertadas y falladas a sus stats
+        if (partida.isPartidaTerminada() && isAdmin()) {
+            estadisticas.addAciertos(partida.getLetrasAcertadas());
+            estadisticas.addFallos(partida.getLetrasFalladas());
+        }
+
+        //Si la partida es de 2 jugadores y está terminada se establece la puntuación
+        if (partida.isPartidaTerminada() && partida.isAhorca2()) partida.establecerPuntuacion();
 
         // Actualiza el modelo con la información relevante.
-        model.addAttribute("palabraOculta", partida.obtenerPalabraOculta());
         model.addAttribute("abecedario", obtenerAbecedario());
         model.addAttribute("pista", partida.getPista());
-        model.addAttribute("letrasProbadas", partida.getLetrasProbadas());
-        model.addAttribute("juegoTerminado", juegoTerminado);
+        model.addAttribute("letrasProbadas", partida.getLetrasProbadas());//Lista que indica cuáles letras no se mostrarán en el teclado
 
         model.addAttribute("partida", partida);
         model.addAttribute("stats", estadisticas);
 
-        // Si el juego ha terminado por exceso de fallos, muestra la palabra oculta.
-        if (fallos >= MAX_FALLOS) {
-            model.addAttribute("palabraOculta", partida.getPalabra());
-        }
 
-        if (ahorca2) {
-            model.addAttribute("jugador1", jugador1);
-            model.addAttribute("jugador2", jugador2);
-        }
+        //Generamos la cookie de fallos (la imagen dependera de esta cookie)
+        generarCookieFallos(partida.getFallos(), response);
 
-        if (juegoTerminado) {
-            estadisticas.addAciertos(partida.getLetrasAcertadas());
-            estadisticas.addFallos(partida.getLetrasFalladas());
-        }
+        //Añadimos el chivato de si la partida termino para mostrar el boton de nueva partida
+        model.addAttribute("juegoTerminado", partida.isPartidaTerminada());
 
         return "ahorcado";
     }
@@ -131,12 +129,12 @@ public class GameController {
      */
     @GetMapping("/nuevaPartida")
     public String nuevaPartida() {
-        if (ahorca2){
+        if (partida.isAhorca2()){
             return "redirect:/ahorca2/nuevaPartida";
         }
 
         partida = new Game();
-        estadisticas.nuevaPartida(partida.getPalabra());
+        if (isAdmin()) estadisticas.nuevaPartida(partida.getPalabra());
 
         return "redirect:/ahorcado";
     }
@@ -147,11 +145,10 @@ public class GameController {
      */
     @GetMapping("/salir")
     public String salir() {
-        ahorca2 = false;
         partida = new Game();
-        jugador1 = 0;
-        jugador2 = 0;
-        turno = 1;
+        Game.puntosJugador1 = 0;
+        Game.puntosJugador2 = 0;
+        Game.turno = 1;
         return "redirect:/home";
     }
 
@@ -161,8 +158,7 @@ public class GameController {
      */
     @GetMapping("/ahorca2/nuevaPartida")
     public String form2jugadores(Model model) {
-        ahorca2 = true;
-        if (turno % 2 != 0) {
+        if (Game.turno % 2 != 0) {
             model.addAttribute("jugador2", "Jugador 2");
         }
 
@@ -181,17 +177,6 @@ public class GameController {
         partida = new Game(nuevaPalabra.toUpperCase(), nuevaPista);
 
         return "redirect:/ahorca2";
-    }
-
-    public void establecerPuntuacion() {
-        if (!partida.obtenerPalabraOculta().contains("_")) {
-            if (turno % 2 == 0) {
-                jugador2++;
-            } else {
-                jugador1++;
-            }
-        }
-        turno++;
     }
 
     /**
@@ -220,5 +205,34 @@ public class GameController {
             if (letra == 'N') abecedario.add('Ñ');
         }
         return abecedario;
+    }
+
+    /**
+     * Verifica si el usuario tiene el rol de admin
+     * @return True si el usuario es admin o False
+     */
+    private boolean isAdmin() {
+        return Objects.equals(obtenerRol(), "ROLE_ADMIN");
+    }
+
+    /**
+     * Obtiene el rol del usuario autenticado
+     * @return Un String del rol.
+     */
+    private String obtenerRol() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Verifica si el usuario está autenticado
+        if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            // Obtiene los roles del usuario
+            for (GrantedAuthority authority : userDetails.getAuthorities()) {
+                String userRole = authority.getAuthority();
+                // Ahora puedes hacer algo con el rol del usuario
+                return userRole;
+            }
+        }
+        return null;
     }
 }
