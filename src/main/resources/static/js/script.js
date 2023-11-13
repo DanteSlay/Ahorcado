@@ -47,7 +47,6 @@ $(document).ready(() => {
         // Verifica si el tiempo ha llegado a cero
         if (tiempoRestante <= 0) {
             clearInterval(temporizadorInterval); // Detiene el temporizador
-            // Agrega aquí la lógica que desees cuando el tiempo llega a cero
             location.reload()
         }
 
